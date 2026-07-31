@@ -5,7 +5,7 @@ let mainGame = document.querySelector('.game-block'),
   startBtn = document.querySelector('.start-btn'),
   endBtn = document.querySelector('.end-btn'),
   btnAnswers = document.querySelectorAll('.answer'),
-  blockQuestion = document.querySelectorAll('.question'),
+  blocksQuestion = document.querySelectorAll('.question'),
   helpBtns = document.querySelectorAll('.hints-help'),
   winBlock = document.querySelectorAll('.wins-block'),
   helpFifty = document.querySelector('.fifty-fifty'),
@@ -386,19 +386,200 @@ function getStartQuestions() {
   }
 }
 
+
+
+// Վերականգնում է պատասխանների բլոկը
 function getStartBlockAnswers() {
   for (let i = 0; i < btnAnswers.length; i++) {
     if (btnAnswers[i].children[0]) {
-      btnAnswers[i].children[0].remove()
+      btnAnswers[i].children[0].remove();
     }
+    btnAnswers[i].classList.remove('green-bg', 'error-answer', 'fifty-active', 'animate__zoomOut', 'color-active');
+  }
+}
+// Այս ֆունկցիան կկանչվի այն ժամանակ, երբ անհրաժեշտ լինի վերականգնել պատասխանների բլոկները
+function getStartBlockWins() {
+  for (let i = 0; i < winBlock.length; i++) {
+    winBlock[i].classList.remove('wins-active', 'animate__animated', 'animate__pulse', 'win-guaranteed', 'animate__tada', 'animate__heartBeat');
+  }
+}
+//նախատեսված է հուշումների  բլոկները զրոյացնելու  համար։
+function getStartBlocksHelp() {
+  for (let i = 0; i < helpBtns.length; i++) {
+    helpBtns[i].classList.remove('block-event', 'hints-help_spent');
+  }
+  aiExplainBlock.classList.remove('show');
+  aiExplainText.innerText = '';
+}
 
-    btnAnswers[i].classList.remove('green-bg','error-answer' , 'fifty-active','animate__zoomOut','color-active')
+
+function correctnessAnswer(numberQuestion,userAnswer,blockQuestionParentElement,blockAnswer) {
+
+  const correctSound = new Audio('./music/correct-sound.mp3')
+  const incorrectSound = new Audio('./music/incorrect-sound.mp3')
+  
+  function playCorrectSound() {
+  correctSound.play();
+  }
+  
+  function playInCorrectSound(){
+  incorrectSoundFlag = true
+  fixed1.pause();
+  incorrectSound.play();
+  }
+  if (answers[numberQuestion] === userAnswer) {
+  
+  setTimeout(() => {
+  blockAnswer.classList.add('green-bg')
+  },500 );
+  playCorrectSound()
+  if (numberQuestion === 'question_extra') {
+  setTimeout(() => {
+  extraQuestion.classList.remove('question_extra')
+  extraQuestion.classList.remove('question_active')
+  }, 500);
+  }
+  
+  }else{
+  setTimeout(() => {
+  
+  blockAnswer.classList.add('error-answer')
+  setTimeout(() => {
+  let blockAnswer = getBlockAnswer(blockQuestionParentElement.children,numberQuestion)
+  blockAnswer.classList.add('green-bg')
+  }, 1000);
+  }, 500);
+  playInCorrectSound()
+  setTimeout(() => {
+  mainGame.classList.remove('animate__backInUp')
+  gemeWrapper.classList.remove('animate__flipInX')
+  mainGame.classList.add('animate__animated','animate__backOutUp')
+  
+  setTimeout(() => {
+  mainGame.style.display('none')
+  startBtn.style.display('block')
+  startBtn.classList.remove('animate__backInDown')
+  }, 1000);
+  setTimeout(() => {
+  startBtn.classList.remove('animate__backInDown')
+  game.style.backgroundImage = ""
+  }, 2000);
+  
+  let userWin =document.querySelector('.user-win')
+  if (userWin) {
+  
+  userWin.remove()
+  
+  }
+  getStartGame()
+  
+  }, 4500);
+  
+  return;
+  
+  }
+  setTimeout(() => {
+    getblock
+  }, timeout);
+
+
+
+
+
+
+  changeQuestion.addEventListener('click',function changeQuestion(){
+    let blockActiveQuestion = getActiveBlockQuestion()
+    blockActiveQuestion.remove()
+    extraQuestion.classList.add("question-active")
+    changeQuestion.classList.add('hints-help_spent','block-evet')
+  });
+
+  function getremoveClassName(){
+    for(let i = 0;i < blockQuestion.length; i++){
+      if(blockQuestion[i].classList.contains("question-actie")){
+        blockQuestion[i].classList.add('animate__animated','animate__fadeOut')
+        blockQuestion[i].classList.remove('question-active')
+        getBlockBefore(blockQuestion[i])
+      }
+      
+
+        
+    }
+  }
+function getBlockBefore(){
+  blockAnswer.insertAdjacentHTML(`<div class="user-win animate__animated animate__fadeIn"><p>Ձեր հաղթանակը</p><p>"${getGarantWin()}"</p></div>`);)
+
+}
+
+
+function getGarantWin(){
+  for (let i = 0; i < winBlock.length; i++) {
+    if(winBlock[i].classList.contains('win-gurenteed')){
+      let getUserWin = winBlock[i].innerText
+      for(let symbol of getUserWin){
+        if(symbol){
+
+        }
+      }
+
+    }
+    
+    
+  }
+}
+
+function getBlockAnswer(blockChildrenElem, numberQuestion) {
+  //Ուսումնասիրում է բոլոր պատասխանները
+  for (let i = 0; i < blockChildrenElem.length; i++) {
+    //ստուգում է եթե տվյալ տեքստը համապատասխանում է answers-ի numberQuestion-րդին,
+    // որպես ճիշտ պատասխան պահպանումէ տվյալ պատասխանը
+    if (blockChildrenElem[i].innerText === answers[numberQuestion]) {
+      return blockChildrenElem[i];
+    }
+  }
+}
+
+// ֆունկցիան նախատեսված է հայտնվող հարցի բլոկը թաքցնելու և նոր հարցի բլոկը ցույց տալու համար։
+function getBlockQuestion() {
+  for (let i = 0; i <= blocksQuestion.length; i++) {
+
+    if (i === blocksQuestion.length - 1) {//Եթե i-ն հասել է վերջին հարցի բլոկին,
+      // ապա կանչվում է getWinBlock(i + 1) որը,ցույց կտա հաղթանակի բլոկը։
+      getWinBlock(i + 1);
+      return;
+    }
+    if (blocksQuestion[i].classList.contains('question-active')) {
+      blocksQuestion[i].classList.add('animate__fadeOut');//ավելանում է հետևյալ անունով կլասը
+      blocksQuestion[i].classList.remove('question-active', 'animate__animated', 'animate__pulse');//հեռացվում է կլասը
+
+      setTimeout(() => {
+        blocksQuestion[++i].classList.add('question-active', 'animate__animated', 'animate__pulse');
+        getWinBlock(i);
+      }, 200);
+      return;
+    }
   }
 }
 
 
-function getStartBlockWins (){
-      for (let i = 0 ; i < winBlock.length;i++){
-         winBlock[i].classList.remove('wins-active','animate__animated','animate__pulse','win-guaranteed','animate__tada', 'animate__heartBeat')
-      }
-}
+const answer = {
+  question_1: "Բ. Յուպիտեր",
+  question_2: "Ա. Արագած",
+  question_3: "Բ. Մուրացան",
+  question_4: "Գ. 46",
+  question_5: "Բ. Նեղոս",
+  question_6: "Բ. Ոսկի",
+  question_7: "Բ. 451 թ.",
+  question_8: "Գ. Փարիզ",
+  question_9: "Բ. Թոմաս Էդիսոն",
+  question_10: "Բ. Եռանկյուն",
+  question_11: "Գ. Խաղաղ",
+  question_12: "Ա. Հովհաննես Թումանյան",
+  question_13: "Բ. 4",
+  question_14: "Գ. Սիրտ",
+  question_15: "Բ. Մադրիդ",
+  question_extra: "Ա. ~300,000 կմ/վ"
+};
+
+
+
